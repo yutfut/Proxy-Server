@@ -45,11 +45,6 @@ func (srv *Server) proxy(w http.ResponseWriter, r *http.Request) {
 func (srv *Server) proxyHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Header.Del("Proxy-Connection")
 
-	//reqId, err := srv.saveRequest(r)
-	//if err != nil {
-	//	log.Printf("fail save to db: %v", err)
-	//}
-
 	resp, err := http.DefaultTransport.RoundTrip(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
@@ -62,11 +57,6 @@ func (srv *Server) proxyHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add(key, value)
 		}
 	}
-
-	//_, err = srv.saveResponse(reqId, resp)
-	//if err != nil {
-	//	log.Printf("fail save to db: %v", err)
-	//}
 
 	w.WriteHeader(resp.StatusCode)
 	_, err = io.Copy(w, resp.Body)
@@ -100,6 +90,8 @@ func (srv *Server) proxyHTTPS(w http.ResponseWriter, r *http.Request) {
 	defer localConn.Close()
 
 	host := strings.Split(r.Host, ":")[0]
+
+	log.Printf(host, r.URL.Scheme)
 
 	tlsConfig, err := generateTLSConfig(host, r.URL.Scheme)
 	if err != nil {
@@ -172,16 +164,6 @@ func (srv *Server) proxyHTTPS(w http.ResponseWriter, r *http.Request) {
 	request.URL.Scheme = "https"
 	hostAndPort := strings.Split(r.URL.Host, ":")
 	request.URL.Host = hostAndPort[0]
-
-	//reqId, err := srv.saveRequest(request)
-	//if err != nil {
-	//	log.Printf("fail save to db: %v", err)
-	//}
-
-	//_, err = srv.saveResponse(reqId, response)
-	//if err != nil {
-	//	log.Printf("fail save to db: %v", err)
-	//}
 }
 
 func generateTLSConfig(host, URL string) (tls.Config, error) {

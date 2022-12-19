@@ -7,15 +7,11 @@ import (
 )
 
 func main() {
-	server := server.Server{
-		Addr:         "8080",
+	s := server.Server{
+		Addr:         "127.0.0.1:8080",
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 
-	for  {
-		go func() {
-			log.Fatal(server.ListenAndServe())
-		}()
-	}
+	log.Fatal(s.ListenAndServe())
 }
